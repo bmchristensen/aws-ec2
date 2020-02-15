@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "ec2-stupify-template"
+Resources:
+    ecSecGroup:
+        Type: "AWS::EC2::SecurityGroup"
+        Properties:
+            GroupDescription: "ec2 ingress ip restriction"
+            GroupName: "ec2SecIngress"
+            VpcId: "vpc-c0daf0ba"
+            SecurityGroupIngress:
+              - IpProtocol: tcp
+                FromPort: 22
+                ToPort: 22
+                CidrIp: 208.100.162.45/32
+
+    ec2StupifyInstance:
+        Type: "AWS::EC2::Instance"
+        Properties:
+            ImageId: "ami-0a887e401f7654935"
+            KeyName: "ec2-test"
+            SecurityGroups: ["ec2SecIngress"]
+            # SecurityGroupIds:
+            #   - "vpc-c0daf0ba"
+            InstanceType: "t2.micro"
+            Tenancy: "default"
+            Monitoring: false
+            DisableApiTermination: false
+            InstanceInitiatedShutdownBehavior: "stop"
+            CreditSpecification: 
+                CPUCredits: "standard"
+            EbsOptimized: false
+            BlockDeviceMappings: 
+              - 
+                DeviceName: "/dev/xvda"
+                Ebs: 
+                    VolumeSize: 8
+                    DeleteOnTermination: true
+                    VolumeType: "gp2"
+            UserData:
+              Fn::Base64:
+                #!/bin/bash
+                sudo yum update -y /n
+                sudo yum install git -y /n
+                
