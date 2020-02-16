@@ -1,5 +1,6 @@
 # import requests
 import boto3
+import urllib
 
 from flask import Flask
 from flask import jsonify
@@ -43,6 +44,7 @@ def return_music():
         link = obj.get('Key')
         this_obj = link.rsplit(sep='/')
         url = "https://{}/{}".format(BUCKET, link)
+        urllib.parse.quote_plus(url)
 
         build_object(response, this_obj, url)
 
