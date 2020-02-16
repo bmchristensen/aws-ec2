@@ -43,8 +43,8 @@ def return_music():
     for obj in objects:
         link = obj.get('Key')
         this_obj = link.rsplit(sep='/')
-        url = "https://{}/{}".format(BUCKET, link)
-        urllib.parse.quote_plus(url)
+        url_string = "https://{}/{}".format(BUCKET, link)
+        url = urllib.parse.quote_plus(url_string)
 
         build_object(response, this_obj, url)
 
@@ -52,4 +52,5 @@ def return_music():
 
 
 if __name__ == "__main__":
+    # app.run()
     app.run(host="0.0.0.0", port=80)
