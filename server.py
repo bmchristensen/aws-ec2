@@ -43,8 +43,8 @@ def return_music():
     for obj in objects:
         link = obj.get('Key')
         this_obj = link.rsplit(sep='/')
-        url_string = "https://{}/{}".format(BUCKET, link)
-        url = url_string.replace(" ", "+")
+        url_str = "https://{}.{}/{}".format(BUCKET, 's3.amazonaws.com', link)
+        url = url_str.replace(" ", "+")
         # url = urllib.parse.quote_plus(url_string)
 
         build_object(response, this_obj, url)
