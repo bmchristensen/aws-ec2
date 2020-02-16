@@ -16,24 +16,20 @@ app.config.from_object(__name__)
 CORS(app, resources={r'/*': {'origins': '*'}})
 
 
-def build_object(obj, value):
-    last_index = len(value)
-    print(value)
+def build_object(obj, value, url):
+    last_index = len(value) - 1
 
-    for i in range(0, last_index - 1):
+    for i in range(0, last_index):
         key = value[i]
 
         if key in obj:
             print("key in obj")
         else:
-            print("key is in obj")
-            print("key = ", key)
             obj[key] = {}
 
         obj = obj[key]
-        print("obj = ", obj)
 
-    obj[value[last_index - 1]] = "value"
+    obj[value[last_index]] = url
 
 
 @app.route('/music', methods=['GET'])
@@ -44,10 +40,11 @@ def return_music():
     response = {}
 
     for obj in objects:
-        this_obj = obj.get('Key').rsplit(sep='/')
+        link = obj.get('Key')
+        this_obj = link.rsplit(sep='/')
+        url = "https://{}/{}".format(BUCKET, link)
 
-        build_object(response, this_obj)
-        print("response = ", response)
+        build_object(response, this_obj, url)
 
     return jsonify(response)
 
