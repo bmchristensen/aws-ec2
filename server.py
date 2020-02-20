@@ -19,17 +19,17 @@ CORS(app, resources={r'/*': {'origins': '*'}})
 
 
 def objectify(obj, artist_album_song, url):
-    last = len(artist_album_song) - 1
+    song = len(artist_album_song) - 1
 
     for this_artist_album_song in artist_album_song:
-        if this_artist_album_song is artist_album_song[last]:
+        if this_artist_album_song is artist_album_song[song]:
             break
         elif this_artist_album_song not in obj:
             obj[this_artist_album_song] = {}
 
         obj = obj[this_artist_album_song]
 
-    obj[artist_album_song[last]] = url
+    obj[artist_album_song[song]] = url
 
 
 @app.route('/music', methods=['GET'])
