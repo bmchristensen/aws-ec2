@@ -1,6 +1,7 @@
 # import requests
 import boto3
 import urllib
+import json
 
 from flask import Flask
 from flask import jsonify
@@ -17,37 +18,32 @@ app.config.from_object(__name__)
 CORS(app, resources={r'/*': {'origins': '*'}})
 
 
-def build_object(obj, value, url):
-    last_index = len(value) - 1
+def objectify(obj, artist_album_song, url):
+    last = len(artist_album_song) - 1
 
-    for i in range(0, last_index):
-        key = value[i]
+    for this_artist_album_song in artist_album_song:
+        if this_artist_album_song is artist_album_song[last]:
+            break
+        elif this_artist_album_song not in obj:
+            obj[this_artist_album_song] = {}
 
-        if key in obj:
-            print("key in obj")
-        else:
-            obj[key] = {}
+        obj = obj[this_artist_album_song]
 
-        obj = obj[key]
-
-    obj[value[last_index]] = url
+    obj[artist_album_song[last]] = url
 
 
 @app.route('/music', methods=['GET'])
 def return_music():
     s3 = boto3.client('s3')
-    s3_objects = s3.list_objects_v2(Bucket=BUCKET)
-    objects = s3_objects.get('Contents')
+    s3_response = s3.list_objects_v2(Bucket=BUCKET).get('Contents')
     response = {}
 
-    for obj in objects:
+    for obj in s3_response:
         link = obj.get('Key')
         this_obj = link.rsplit(sep='/')
         url_str = "https://{}.{}/{}".format(BUCKET, 's3.amazonaws.com', link)
         url = url_str.replace(" ", "+")
-        # url = urllib.parse.quote_plus(url_string)
-
-        build_object(response, this_obj, url)
+        objectify(response, this_obj, url)
 
     return jsonify(response)
 
