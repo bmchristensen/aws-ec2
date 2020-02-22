@@ -32,6 +32,19 @@ def objectify(obj, artist_album_song, url):
     obj[artist_album_song[song]] = url
 
 
+def db_query(**query_params):
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table(DB)
+
+    response = table.query(
+        KeyConditionExpression=Key(query_params.get('pk')).eq(query_params.get('sk'))
+    )
+
+    item = response['Items']
+    for each in item:
+        print(each.get('sk'))
+
+
 @app.route('/music', methods=['GET'])
 def return_music():
     s3 = boto3.client('s3')
