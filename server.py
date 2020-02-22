@@ -53,6 +53,14 @@ def db_query(**params):
     return item
 
 
+def responsify(response):
+    ret = list()
+    for each in response:
+        ret.append(each.get('sk'))
+
+    return ret
+
+
 @app.route('/music', methods=['GET'])
 def return_music():
     s3 = boto3.client('s3')
@@ -70,12 +78,9 @@ def return_music():
 
 @app.route('/genres', methods=['GET'])
 def genres():
-    ret = dict()
     response = db_query(pk='pk', sk='Genre')
-    for each in response[0]:
-        ret.update(each.get('sk'))
 
-    return jsonify(ret)
+    return jsonify(responsify(response))
 
 
 @app.route('/artists/by/genre/', methods=['GET'])
@@ -83,7 +88,7 @@ def artists_by_genre():
     genre = request.args.get('genre', type=str)
     response = db_query(pk='pk', sk=genre)
 
-    return jsonify(response)
+    return jsonify(responsify(response))
 
 
 @app.route('/albums/for/artist', methods=['GET'])
@@ -91,7 +96,7 @@ def albums_for_artist():
     artist = request.args.get('artist', type=str)
     response = db_query(pk='pk', sk=artist)
 
-    return jsonify(response)
+    return jsonify(responsify(response))
 
 
 @app.route('/songs/for/album', methods=['GET'])
@@ -99,7 +104,7 @@ def songs_for_album():
     album = request.args.get('album', type=str)
     response = db_query(pk='pk', sk=album)
 
-    return jsonify(response)
+    return jsonify(responsify(response))
 
 
 @app.route('/song', methods=['GET'])
@@ -113,5 +118,5 @@ def song():
 
 
 if __name__ == "__main__":
-    app.run()
-    # app.run(host="0.0.0.0", port=80)
+    # app.run()
+    app.run(host="0.0.0.0", port=80)
