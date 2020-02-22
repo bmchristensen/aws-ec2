@@ -3,13 +3,11 @@ import boto3
 import urllib
 import json
 
-from boto3.dynamodb.conditions import Attr
 from boto3.dynamodb.conditions import Key
 from flask import Flask
 from flask import jsonify
 from flask import request
 from flask_cors import CORS
-from markupsafe import escape
 
 BUCKET = "cloud-dev-bucket-s3bucket-1sifmcfkfvav1"
 DB = 'music_pKsK'
@@ -19,6 +17,13 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 
 CORS(app, resources={r'/*': {'origins': '*'}})
+
+
+def build_url(path):
+    url_str = "https://{}.{}/{}".format(BUCKET, 's3.amazonaws.com', path)
+    url = url_str.replace(" ", "+")
+
+    return url
 
 
 def objectify(obj, artist_album_song, url):
@@ -35,12 +40,12 @@ def objectify(obj, artist_album_song, url):
     obj[artist_album_song[song]] = url
 
 
-def db_query(**query_params):
+def db_query(**params):
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table(DB)
 
     response = table.query(
-        KeyConditionExpression=Key(query_params.get('pk')).eq(query_params.get('sk'))
+        KeyConditionExpression=Key(params.get('pk')).eq(params.get('sk'))
     )
 
     item = response['Items']
@@ -57,8 +62,7 @@ def return_music():
     for obj in s3_response:
         link = obj.get('Key')
         this_obj = link.rsplit(sep='/')
-        url_str = "https://{}.{}/{}".format(BUCKET, 's3.amazonaws.com', link)
-        url = url_str.replace(" ", "+")
+        url = build_url(link)
         objectify(response, this_obj, url)
 
     return jsonify(response)
@@ -99,8 +103,10 @@ def songs_for_album():
 def song():
     song = request.args.get('song', type=str)
     response = db_query(pk='pk', sk=song)
+    link = response[0].get('sk')
+    url = build_url(link)
 
-    return jsonify(response)
+    return jsonify(url)
 
 
 if __name__ == "__main__":
