@@ -3,14 +3,17 @@ import boto3
 import urllib
 import json
 
+from boto3.dynamodb.conditions import Attr
+from boto3.dynamodb.conditions import Key
 from flask import Flask
 from flask import jsonify
-# from flask import request
+from flask import request
 from flask_cors import CORS
+from markupsafe import escape
 
-
-DEBUG = True
 BUCKET = "cloud-dev-bucket-s3bucket-1sifmcfkfvav1"
+DB = 'music_pKsK'
+DEBUG = True
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -41,8 +44,8 @@ def db_query(**query_params):
     )
 
     item = response['Items']
-    for each in item:
-        print(each.get('sk'))
+
+    return item
 
 
 @app.route('/music', methods=['GET'])
@@ -61,6 +64,45 @@ def return_music():
     return jsonify(response)
 
 
+@app.route('/genres', methods=['GET'])
+def genres():
+    response = db_query(pk='pk', sk='Genre')
+
+    return jsonify(response)
+
+
+@app.route('/artists/by/genre/', methods=['GET'])
+def artists_by_genre():
+    genre = request.args.get('genre', type=str)
+    response = db_query(pk='pk', sk=genre)
+
+    return jsonify(response)
+
+
+@app.route('/albums/for/artist', methods=['GET'])
+def albums_for_artist():
+    artist = request.args.get('artist', type=str)
+    response = db_query(pk='pk', sk=artist)
+
+    return jsonify(response)
+
+
+@app.route('/songs/for/album', methods=['GET'])
+def songs_for_album():
+    album = request.args.get('album', type=str)
+    response = db_query(pk='pk', sk=album)
+
+    return jsonify(response)
+
+
+@app.route('/song', methods=['GET'])
+def song():
+    song = request.args.get('song', type=str)
+    response = db_query(pk='pk', sk=song)
+
+    return jsonify(response)
+
+
 if __name__ == "__main__":
-    # app.run()
-    app.run(host="0.0.0.0", port=80)
+    app.run()
+    # app.run(host="0.0.0.0", port=80)
