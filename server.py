@@ -20,8 +20,8 @@ CORS(app, resources={r'/*': {'origins': '*'}})
 
 
 def build_url(path):
-    url_str = "https://{}.{}/{}".format(BUCKET, 's3.amazonaws.com', path)
-    url = url_str.replace(" ", "+")
+    url_str = 'https://{}.{}/{}'.format(BUCKET, 's3.amazonaws.com', path)
+    url = url_str.replace(' ', '+')
 
     return url
 
@@ -70,9 +70,12 @@ def return_music():
 
 @app.route('/genres', methods=['GET'])
 def genres():
+    ret = dict()
     response = db_query(pk='pk', sk='Genre')
+    for each in response[0]:
+        ret.update(each.get('sk'))
 
-    return jsonify(response)
+    return jsonify(ret)
 
 
 @app.route('/artists/by/genre/', methods=['GET'])
