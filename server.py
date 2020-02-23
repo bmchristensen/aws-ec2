@@ -10,7 +10,7 @@ from flask import request
 from flask_cors import CORS
 
 BUCKET = "cloud-dev-bucket-s3bucket-1sifmcfkfvav1"
-DB = 'music_pKsK'
+DB = 'music'
 DEBUG = True
 
 app = Flask(__name__)
