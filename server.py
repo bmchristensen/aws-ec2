@@ -41,7 +41,7 @@ def objectify(obj, artist_album_song, url):
 
 
 def db_query(**params):
-    dynamodb = boto3.resource('dynamodb')
+    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
     table = dynamodb.Table(DB)
 
     response = table.query(
@@ -63,7 +63,7 @@ def responsify(response):
 
 @app.route('/music', methods=['GET'])
 def return_music():
-    s3 = boto3.client('s3')
+    s3 = boto3.client('s3', region_name='us-east-1')
     s3_response = s3.list_objects_v2(Bucket=BUCKET).get('Contents')
     response = {}
 
