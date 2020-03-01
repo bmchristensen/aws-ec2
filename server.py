@@ -8,16 +8,19 @@ from flask import Flask
 from flask import jsonify
 from flask import request
 from flask_cors import CORS
+# from flask_cors import cross_origin
 
 BUCKET = "cloud-dev-bucket-s3bucket-1sifmcfkfvav1"
 DB = 'music'
-DB_USER = 'user'
+DB_USER = 'users'
 DEBUG = True
 
 app = Flask(__name__)
 app.config.from_object(__name__)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
-CORS(app, resources={r'/*': {'origins': '*'}})
+CORS(app)
+# CORS(app, resources={r'/*': {'origins': '*'}})
 
 
 def build_url(path):
@@ -62,23 +65,22 @@ def responsify(response):
     return ret
 
 
-@app.route('/save-user', methods=['POST'])
+@app.route('/save', methods=['POST'])
 def save_user():
     dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
     table = dynamodb.Table(DB_USER)
 
-    print(request.args.get('email', type=str))
     with table.batch_writer() as batch:
         batch.put_item(
             Item={
-                'pk': request.args.get('uid', type=str),
-                'email': request.args.get('email', type=str),
-                'fname': request.args.get('fname', type=str),
-                'lname': request.args.get('lname', type=str)
+                'uid': request.json.get('uid'),
+                'email': request.json.get('email'),
+                'fname': request.json.get('fname'),
+                'lname': request.json.get('lname')
             }
         )
 
-    return 200
+    return 'OK'
 
 
 @app.route('/music', methods=['GET'])
