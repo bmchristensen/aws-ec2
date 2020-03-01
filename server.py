@@ -11,6 +11,7 @@ from flask_cors import CORS
 
 BUCKET = "cloud-dev-bucket-s3bucket-1sifmcfkfvav1"
 DB = 'music'
+DB_USER = 'user'
 DEBUG = True
 
 app = Flask(__name__)
@@ -59,6 +60,25 @@ def responsify(response):
         ret.append(each.get('sk'))
 
     return ret
+
+
+@app.route('/save-user', methods=['POST'])
+def save_user():
+    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
+    table = dynamodb.Table(DB_USER)
+
+    print(request.args.get('email', type=str))
+    with table.batch_writer() as batch:
+        batch.put_item(
+            Item={
+                'pk': request.args.get('uid', type=str),
+                'email': request.args.get('email', type=str),
+                'fname': request.args.get('fname', type=str),
+                'lname': request.args.get('lname', type=str)
+            }
+        )
+
+    return 200
 
 
 @app.route('/music', methods=['GET'])
