@@ -8,7 +8,7 @@ from flask import Flask
 from flask import jsonify
 from flask import request
 from flask_cors import CORS
-from flask_cors import cross_origin
+# from flask_cors import cross_origin
 
 BUCKET = "cloud-dev-bucket-s3bucket-1sifmcfkfvav1"
 DB = 'music'
@@ -20,7 +20,7 @@ app.config.from_object(__name__)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 CORS(app)
-CORS(app, resources={r'/*': {'origins': '*'}})
+# CORS(app, resources={r'/*': {'origins': '*'}})
 
 
 def build_url(path):
@@ -66,7 +66,6 @@ def responsify(response):
 
 
 @app.route('/save', methods=['POST'])
-@cross_origin()
 def save_user():
     dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
     table = dynamodb.Table(DB_USER)
