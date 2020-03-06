@@ -3,12 +3,11 @@ import boto3
 import urllib
 import json
 
-from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.conditions import Key, Attr
 from flask import Flask
 from flask import jsonify
 from flask import request
 from flask_cors import CORS
-# from flask_cors import cross_origin
 
 BUCKET = "cloud-dev-bucket-s3bucket-1sifmcfkfvav1"
 DB = 'music'
@@ -20,7 +19,6 @@ app.config.from_object(__name__)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 CORS(app)
-# CORS(app, resources={r'/*': {'origins': '*'}})
 
 
 def build_url(path):
@@ -63,24 +61,6 @@ def responsify(response):
         ret.append(each.get('sk'))
 
     return ret
-
-
-@app.route('/save', methods=['POST'])
-def save_user():
-    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
-    table = dynamodb.Table(DB_USER)
-
-    with table.batch_writer() as batch:
-        batch.put_item(
-            Item={
-                'uid': request.json.get('uid'),
-                'email': request.json.get('email'),
-                'fname': request.json.get('fname'),
-                'lname': request.json.get('lname')
-            }
-        )
-
-    return 'OK'
 
 
 @app.route('/music', methods=['GET'])
@@ -140,5 +120,5 @@ def song():
 
 
 if __name__ == "__main__":
-    # app.run()
-    app.run(host="0.0.0.0", port=80)
+    app.run()
+    # app.run(host="0.0.0.0", port=80)
