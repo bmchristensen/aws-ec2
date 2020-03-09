@@ -63,6 +63,17 @@ def responsify(response):
     return ret
 
 
+@app.route('/play', methods=['POST'])
+def play():
+    artist = request.json.get('artist')
+    album = request.json.get('album')
+    song = request.json.get('song')
+
+    print(artist, album, song)
+
+    return 'OK'
+
+
 @app.route('/music', methods=['GET'])
 def return_music():
     s3 = boto3.client('s3', region_name='us-east-1')
