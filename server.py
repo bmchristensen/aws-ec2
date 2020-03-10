@@ -1,9 +1,7 @@
 # import requests
 import boto3
-import urllib
-import json
 
-from boto3.dynamodb.conditions import Key, Attr
+from boto3.dynamodb.conditions import Key
 from flask import Flask
 from flask import jsonify
 from flask import request
